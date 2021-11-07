@@ -1,0 +1,4 @@
+name: Protobufs JS
+runs:
+  using: 'docker'
+  image: 'Dockerfile'

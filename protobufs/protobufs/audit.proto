@@ -1,0 +1,142 @@
+syntax = "proto3";
+
+package sancus;
+
+import "google/protobuf/timestamp.proto";
+
+import "protobufs/account.proto";
+import "protobufs/webauthn.proto";
+
+message ExchangeRate {
+    string currency = 1;
+    string rate = 3;
+}
+
+message Audit {
+    uint64 bitcoinBlock = 1;
+    uint64 ethereumBlock = 2;
+    google.protobuf.Timestamp timestamp = 3;
+    string baseCurrency = 4;
+    ExchangeRates exchangeRates = 5;
+    uint64 auditVersion = 6;
+}
+
+message Account {
+    bytes accountId = 1;
+    bytes userId = 2;
+    AccountType accountType = 3;
+    string currency = 4;
+    uint64 auditVersion = 5;
+}
+
+message ExchangeRates {
+    repeated ExchangeRate exchangeRates = 1;
+}
+
+message UserKey {
+    bytes keyId = 1;
+    bytes userId = 2;
+    bytes publicKey = 3;
+    bytes credentialId = 4;
+    PublicKeyCredentialType credentialType = 5;
+    uint64 auditVersion = 6;
+}
+
+message Key {
+    bytes keyId = 1;
+    bytes publicKey = 2;
+    bytes permutedPublicKey = 3;
+    bytes permutationNIZK = 4;
+    bytes assetOwnershipCommitment = 5;
+    bytes assetOwnershipNIZK = 6;
+    uint64 auditVersion = 7;
+}
+
+message KeyAccount {
+    bytes keyId = 1;
+    bytes accountId = 2;
+    bytes ownershipCommitment = 3;
+    bytes ownershipNIZK = 4;
+    uint64 blockNumber = 5; // block number after which this deposit key commitment because valid. This must be >= the previous audit block number
+    uint64 auditVersion = 6;
+}
+
+message KeyAccountLiability {
+    bytes keyId = 1;
+    bytes accountId = 2;
+    bytes p = 3; // see the provisons paper, protocol 1
+    bytes nizk = 4;
+    uint64 auditVersion = 5;
+}
+
+message KeyCurrencyAsset {
+    bytes keyId = 1;
+    string currency = 2;
+    bytes p = 3; // see the provisons paper, protocol 1
+    bytes nizk = 4;
+    uint64 auditVersion = 5;
+}
+
+message AccountDeltaGroup {
+    bytes id = 1;
+    bytes userId = 2;
+    ChallengeRequest challengeRequest = 3;  // challenge is of type AccountDeltaGroupChallengeRequet
+    AuthenticatorAssertionResponse assertion = 4;
+    // the transaction ids for each mined transaction inside the ((AccountDeltaGroupChallengeRequet) challengeRequest.request).transactions.
+    // Should be same length and in same order. Serves as a hint to the auditor where to look in the blockchain for these transactions.
+    repeated bytes txnIds = 5;
+    uint64 auditVersion = 6;
+}
+
+message UserCumulativeLiability {
+    bytes userId = 1;
+    // liabilityCurrencyConversions converts the sum of `AccountDeltaGroup` and `KeyAccountLiability`
+    // for the given user in this audit into the base currency
+    // CurrencyConversion.toCurrency should always be equal to Audit.baseCurrency
+    // CurrencyConversion.fromCurrency should be unique in the list
+    // CurrencyConversion.fromCurrencyCommitment should be equal to the sum of the "p" values from every `KeyAccountLiability`
+    // in the audit plus the AccountDeltaGroup commitments
+    // CurrencyConversion.toCurrencyCommitment should be consistent with Audit.exchangeRates, which can be verified bia
+    // CurrencyConversion.nizk
+    // CurrencyConversion.auditVersion should always be equal to SolvencyProof.auditVersion
+    repeated CurrencyConversion liabilityCurrencyConversions = 2;
+
+    // nizk showing that the sum of the liabilityCurrencyConversions
+    bytes nizk = 3;
+    // whether the balance in the nizk is negative. if so, then the auditor should add 2**127 to it
+    // and the proof should hold, BUT then the auditor should NOT found the cumulative commitment
+    // in the total exchange liabilities
+    // this ensures that the exchange cannot artifically lower liabilities through bogus users it controls
+    bool isNegative = 4;
+    uint64 auditVersion = 5;
+}
+
+message SolvencyProof {
+    // liabilityCurrencyConversions converts the sum of `KeyCurrencyAsset` for this audit into the base currency
+    // CurrencyConversion.toCurrency should always be equal to Audit.baseCurrency
+    // CurrencyConversion.fromCurrency should be unique in the list
+    // CurrencyConversion.fromCurrencyCommitment should be equal to the sum of the "p" values from every `KeyCurrencyAsset`
+    // in the audit
+    // CurrencyConversion.toCurrencyCommitment should be consistent with Audit.exchangeRates, which can be verified bia
+    // CurrencyConversion.nizk
+    // CurrencyConversion.auditVersion should always be equal to SolvencyProof.auditVersion
+    repeated CurrencyConversion assetCurrencyConversions = 1;
+
+    // this nizk demonstrates that the 0 <= sum(assetCurrencyConversions.toCurrencyCommitment)
+    // - sum(UserCumulativeLiability.liabilityCurrencyConversions.toCurrencyCommitment) < 2^255. 
+    // stopping at bit 128 since the group has 256 unsigned bits.
+    // The upper bit order would represent negative numbers, so we want to show that this difference
+    // is positive.
+    bytes nizk = 2;
+
+    uint64 auditVersion = 3;
+}
+
+message CurrencyConversion {
+    string fromCurrency = 1;
+    string toCurrency = 2;
+    bytes fromCurrencyCommitment = 3;
+    bytes toCurrencyCommitment = 4;
+    bytes nizk = 5;
+    uint64 auditVersion = 6;
+}

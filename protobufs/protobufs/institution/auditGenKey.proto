@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package sancus.institution;
+
+import "protobufs/audit.proto";
+
+service AuditGenKey {
+    rpc ListKeysByAudit(ListKeysByAuditRequest) returns (ListKeysByAuditResponse);
+    rpc ListKeysNotInAudit(ListKeysNotInAuditRequest) returns (ListKeysNotInAuditResponse);
+    rpc AddKeyToAudit(AddKeyToAuditRequest) returns (AddKeyToAuditResponse);
+    rpc GetKey(GetKeyRequest) returns (GetKeyResponse);
+}
+
+message ListKeysByAuditRequest {
+    message Request {
+          uint64 auditVersion = 1;
+    }
+    oneof testRequestOrNext {
+         Request request = 1;
+         string nextToken = 2;
+     }
+}
+
+message ListKeysByAuditResponse {
+    message Response {
+        Key key = 1;
+    }
+    repeated Response response = 1;
+    string nextToken = 2;
+}
+
+message ListKeysNotInAuditRequest {
+    message Request {
+    }
+    oneof testRequestOrNext {
+         Request request = 1;
+         string nextToken = 2;
+     }
+}
+
+message ListKeysNotInAuditResponse {
+    message Response {
+        bytes keyId = 1;
+    }
+    repeated Response response = 1;
+    string nextToken = 2;
+}
+
+message AddKeyToAuditRequest {
+    bytes keyId = 1;
+    uint64 auditVersion = 2;
+}
+
+message AddKeyToAuditResponse {
+    Key key = 1;
+}
+
+message GetKeyRequest {
+    bytes keyId = 1;
+}
+
+message GetKeyResponse {
+    Key key = 1;
+}

@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package sancus.institution;
+
+import "protobufs/audit.proto";
+
+service AuditGenAccount {
+    rpc ListAccountsByAudit(ListAccountsByAuditRequest) returns (ListAccountsByAuditResponse);
+    rpc ListAccountsNotInAudit(ListAccountsNotInAuditRequest) returns (ListAccountsNotInAuditResponse);
+    rpc AddAccountToAudit(AddAccountToAuditRequest) returns (AddAccountToAuditResponse);
+    rpc GetAccount(GetAccountRequest) returns (GetAccountResponse);
+}
+
+message ListAccountsByAuditRequest {
+    message Request {
+          uint64 auditVersion = 1;
+    }
+    oneof testRequestOrNext {
+         Request request = 1;
+         string nextToken = 2;
+     }
+}
+
+message ListAccountsByAuditResponse {
+    message Response {
+        Account account = 1;
+    }
+    repeated Response response = 1;
+    string nextToken = 2;
+}
+
+message ListAccountsNotInAuditRequest {
+    message Request {
+    }
+    oneof testRequestOrNext {
+         Request request = 1;
+         string nextToken = 2;
+     }
+}
+
+message ListAccountsNotInAuditResponse {
+    message Response {
+        bytes accountId = 1;
+    }
+    repeated Response response = 1;
+    string nextToken = 2;
+}
+
+message AddAccountToAuditRequest {
+    bytes accountId = 1;
+    uint64 auditVersion = 2;
+}
+
+message AddAccountToAuditResponse {
+    Account account = 1;
+}
+
+message GetAccountRequest {
+    bytes accountId = 1;
+}
+
+message GetAccountResponse {
+    Account account = 1;
+}

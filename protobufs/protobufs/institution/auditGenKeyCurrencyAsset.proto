@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+package sancus.institution;
+
+import "protobufs/audit.proto";
+
+service AuditGenKeyCurrencyAsset {
+    rpc ListKeyCurrencyAssetsByAudit(ListKeyCurrencyAssetsByAuditRequest) returns (ListKeyCurrencyAssetsByAuditResponse);
+    rpc ListKeyCurrencyAssetsNotInAudit(ListKeyCurrencyAssetsNotInAuditRequest) returns (ListKeyCurrencyAssetsNotInAuditResponse);
+    rpc AddKeyCurrencyAssetToAudit(AddKeyCurrencyAssetToAuditRequest) returns (AddKeyCurrencyAssetToAuditResponse);
+    rpc GetKeyCurrencyAsset(GetKeyCurrencyAssetRequest) returns (GetKeyCurrencyAssetResponse);
+}
+
+message ListKeyCurrencyAssetsByAuditRequest {
+    message Request {
+          uint64 auditVersion = 1;
+    }
+    oneof testRequestOrNext {
+         Request request = 1;
+         string nextToken = 2;
+     }
+}
+
+message ListKeyCurrencyAssetsByAuditResponse {
+    message Response {
+        KeyCurrencyAsset keyCurrencyAsset = 1;
+    }
+    repeated Response response = 1;
+    string nextToken = 2;
+}
+
+message ListKeyCurrencyAssetsNotInAuditRequest {
+    message Request {
+        uint64 auditVersion = 1;
+    }
+    oneof testRequestOrNext {
+         Request request = 1;
+         string nextToken = 2;
+     }
+}
+
+message ListKeyCurrencyAssetsNotInAuditResponse {
+    message Response {
+        bytes keyId = 1;
+        string currency = 2;
+    }
+    repeated Response response = 1;
+    string nextToken = 2;
+}
+
+message AddKeyCurrencyAssetToAuditRequest {
+    bytes keyId = 1;
+    string currency = 2;
+    uint64 auditVersion = 3;
+}
+
+message AddKeyCurrencyAssetToAuditResponse {
+    KeyCurrencyAsset keyCurrencyAsset = 1;
+}
+
+message GetKeyCurrencyAssetRequest {
+    bytes keyId = 1;
+    string currency = 2;
+    uint64 auditVersion = 3;
+}
+
+message GetKeyCurrencyAssetResponse {
+    KeyCurrencyAsset keyCurrencyAsset = 1;
+}

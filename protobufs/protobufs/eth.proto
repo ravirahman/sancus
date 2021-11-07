@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package sancus;
+
+import "google/protobuf/timestamp.proto";
+
+// message types for Ethereum
+
+
+message EthereumTxParams {
+    // From https://github.com/ethereum/web3.py/blob/d86c3ab95cd6e4dcae7703eb30682ecb2ea3d188/web3/types.py#L183
+    uint64 value = 1;
+    uint64 chainId = 2;
+    uint64 gas = 3;
+    uint64 gasPrice = 4;
+    uint64 nonce = 5;
+    string toAddress = 6;
+    bytes data = 7;
+    string fromAddress = 8;
+}
+
+message EthereumBlockData {
+    // From https://github.com/ethereum/web3.py/blob/d86c3ab95cd6e4dcae7703eb30682ecb2ea3d188/web3/types.py#L271
+    uint64 difficulty = 1;
+    bytes extraData = 2;
+    uint64 gasLimit = 3;
+    uint64 gasUsed = 4;
+    bytes hash = 5;
+    bytes logsBloom = 6;
+    string miner = 7;
+    bytes mixHash = 8;
+    bytes nonce = 9;
+    uint64 number = 10;
+    bytes parentHash = 11;
+    bytes receiptRoot = 12;
+    bytes sha3Uncles = 13;
+    uint64 size = 14;
+    bytes stateRoot = 15;
+    google.protobuf.Timestamp timestamp = 16;
+    uint64 totalDifficulty = 17;
+    repeated EthereumTxData transactions = 18;
+    bytes transactionsRoot = 19;
+    repeated bytes uncles = 20;
+}
+
+message EthereumTxData {
+    // From https://github.com/ethereum/web3.py/blob/d86c3ab95cd6e4dcae7703eb30682ecb2ea3d188/web3/types.py#L162
+    uint64 value = 1;
+    uint64 gas = 2;
+    uint64 gasPrice = 3;
+    uint64 nonce = 4;
+    string toAddress = 5;
+    bytes data = 6;
+    string fromAddress = 7;
+    uint64 blockNumber = 8;
+    bytes blockHash = 9;
+    uint64 v = 10;
+    bytes hash = 11;
+    bytes input = 12;
+    bytes r = 13;
+    bytes s = 14;
+    uint64 transactionIndex = 15;
+    uint64 chainId = 16;
+}

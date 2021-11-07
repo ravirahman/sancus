@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package sancus;
+
+import "google/protobuf/any.proto";
+
+message PublicAccountDeltaCommitment {
+    bytes accountId = 1;
+    // given an Pedersen commitment of the form C = xG + rH, where x represents the amount of the delta
+    // then the commitment field below is C
+    bytes commitment = 2;
+}
+
+message RevealedAccountDeltaCommitment {
+    bytes accountId = 1;
+    RevealedPedersenCommitment commitment = 2;
+}
+
+// message types for zero knowledge roofs
+message RevealedPedersenCommitment {
+    // Assume that the Pedersen commitment has the form C = xG + rH
+    // bytes C = 1; // technically this field is not needed since G and H are public, and x and r are provided below
+    string x = 2;
+    string r = 3;
+}
+
+enum AccountType {
+    INVALID_ACCOUNT_TYPE = 0;
+    DEPOSIT_ACCOUNT = 1;
+    LOAN_ACCOUNT = 2;
+    COLLATERAL_ACCOUNT = 3;
+}
+
+message UnsignedBlockchainTransacton {
+    string blockchain = 1;
+    google.protobuf.Any txParams = 2;
+}
+
+message AccountDeltaGroupChallengeRequest {
+    repeated PublicAccountDeltaCommitment commitments = 1;
+    repeated UnsignedBlockchainTransacton transactions = 2;
+}

@@ -1,0 +1,10 @@
+{
+    "name": "protobufs",
+    "version": "1.0.2",
+    "description": "Protobufs for sancus",
+    "author": "Ravi Rahman",
+    "license": "UNLICENSED",
+    "dependencies": {
+        "ts-protoc-gen": "^0.14.0"
+    }
+}

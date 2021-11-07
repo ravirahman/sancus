@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package sancus.institution;
+
+import "protobufs/webauthn.proto";
+
+service Auth {
+    rpc MakeRegistrationChallenge(MakeRegistrationChallengeRequest) returns (MakeRegistrationChallengeResponse);
+    rpc Register(RegisterRequest) returns (RegisterResponse);
+    rpc MakeLoginChallenge(MakeLoginChallengeRequest) returns (MakeLoginChallengeResponse);
+    rpc Login(LoginRequest) returns (LoginResponse);
+}
+
+message MakeRegistrationChallengeRequest {
+    string username = 1;
+}
+
+message MakeRegistrationChallengeResponse {
+    ChallengeRequest challengeRequest = 1;  // challenge is of type None
+    PublicKeyCredentialCreationOptions credentialRequest = 2;
+}
+
+message MakeLoginChallengeRequest {
+    string username = 1;
+}
+
+message MakeLoginChallengeResponse {
+    ChallengeRequest challengeRequest = 1;  // challenge is of type None
+    PublicKeyCredentialRequestOptions credentialRequest = 2;
+}
+
+message RegisterRequest {
+    bytes challengeNonce = 1;
+    AuthenticatorAttestationResponse attestation = 2;    
+}
+
+message RegisterResponse {
+    string jwt = 1;
+}
+
+message LoginRequest {
+    bytes challengeNonce = 1;
+    AuthenticatorAssertionResponse assertion = 2;
+}
+
+message LoginResponse {
+    string jwt = 1;
+}

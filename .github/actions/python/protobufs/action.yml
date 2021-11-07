@@ -1,0 +1,4 @@
+name: Protobufs Python
+runs:
+  using: 'docker'
+  image: 'Dockerfile'

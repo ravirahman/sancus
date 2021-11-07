@@ -1,0 +1,64 @@
+on:
+  push:
+    paths:
+      - 'auditor/**'
+      - 'protobufs/**'
+      - 'common/**'
+      - 'infra/**'
+      - '.github/**'
+  workflow_dispatch: {}
+defaults:
+  run:
+    shell: bash
+    working-directory: auditor
+jobs:
+  auditor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v2
+      - name: Infra Start  # starting infra first, since it takes time for the bitcoin and ethereum nodes to warm up
+        run: |
+          set -ex
+          cd ../infra
+          docker-compose up -d
+      - uses: ./.github/actions/python/protobufs
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          # This path is specific to Ubuntu
+          path: ~/.cache/pip
+          # Look to see if there is a cache hit for the corresponding requirements file
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+            ${{ runner.os }}-
+      - uses: ./.github/actions/setup
+        with:
+          working_directory: .
+      - name: Requirements
+        run: |
+          set -ex
+          python -m pip install --upgrade pip wheel
+          make requirements
+      - uses: ./.github/actions/python/sanitize
+        with:
+          working_directory: auditor
+      - name: Infra Status Check
+        run: |
+          set -ex
+          cd ../infra
+          sudo curl -L -o /usr/bin/wait-for-it https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh
+          sudo chmod 775 /usr/bin/wait-for-it
+          wait-for-it localhost:8080 -t 10
+          wait-for-it localhost:8081 -t 1
+          wait-for-it localhost:18443 -t 1
+          wait-for-it localhost:18444 -t 1
+          wait-for-it localhost:8545 -t 1
+          wait-for-it localhost:8546 -t 1
+      - name: Test
+        run: |
+          make test

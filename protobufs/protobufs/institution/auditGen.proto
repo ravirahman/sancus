@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package sancus.institution;
+
+import "google/protobuf/timestamp.proto";
+import "protobufs/audit.proto";
+
+service AuditGen {
+    rpc GenerateAudit(GenerateAuditRequest) returns (GenerateAuditResponse);
+    rpc ListAudits(ListAuditsRequest) returns (ListAuditsResponse);
+    rpc GetAudit(GetAuditRequest) returns (GetAuditResponse);
+    rpc FinalizeAudit(FinalizeAuditRequest) returns (FinalizeAuditResponse);
+}
+
+message GenerateAuditRequest {
+}
+
+message GenerateAuditResponse {
+    Audit audit = 1;
+    SolvencyProof solvencyProof = 2;
+}
+
+message ListAuditsRequest {
+    message Request {
+          google.protobuf.Timestamp fromTimestamp = 1;
+          google.protobuf.Timestamp toTimestamp = 2;
+    }
+    oneof testRequestOrNext {
+         Request request = 1;
+         string nextToken = 2;
+     }
+}
+
+message ListAuditsResponse {
+    message Response {
+        Audit audit = 1;
+        SolvencyProof solvencyProof = 2;
+    }  
+    repeated Response response = 1;
+    string nextToken = 2;
+}
+
+message GetAuditRequest {
+    uint64 auditVersion = 1;
+}
+
+message GetAuditResponse {
+    Audit audit = 1;
+    SolvencyProof solvencyProof = 2;
+}
+
+message FinalizeAuditRequest {
+    uint64 auditVersion = 1;
+}
+
+message FinalizeAuditResponse {
+    Audit audit = 1;
+    SolvencyProof solvencyProof = 2;
+}

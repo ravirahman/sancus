@@ -1,0 +1,42 @@
+on:
+  push:
+    paths:
+      - '*'
+      - 'common/**'
+      - 'backend/**'
+      - 'auditor/**'
+      - 'auditgen/**'
+      - '.github/**'
+  workflow_dispatch: {}
+defaults:
+  run:
+    shell: bash
+    working-directory: .
+jobs:
+  runner:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/python/protobufs
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          # This path is specific to Ubuntu
+          path: ~/.cache/pip
+          # Look to see if there is a cache hit for the corresponding requirements file
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+            ${{ runner.os }}-
+      - name: Requirements
+        run: |
+          set -ex
+          python -m pip install --upgrade pip wheel
+          make requirements
+      - uses: ./.github/actions/python/sanitize
+        with:
+          working_directory: .

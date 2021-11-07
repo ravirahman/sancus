@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package sancus.institution;
+
+import "protobufs/webauthn.proto";
+import "protobufs/account.proto";
+
+service Withdrawal {
+    rpc InitiateWithdrawal(InitiateWithdrawalRequest) returns (InitiateWithdrawalResponse);
+    rpc ProcessWithdrawal(ProcessWithdrawalRequest) returns (ProcessWithdrawalResponse);
+}
+
+message InitiateWithdrawalRequest {
+    bytes fromAccountId = 1;
+    string destinationAddress = 2;
+    string amount = 3;
+}
+
+message InitiateWithdrawalResponse {
+    bytes id = 1;
+    ChallengeRequest challengeRequest = 2;  // challenge is of type AccountDeltaGroupChallengeRequest
+    repeated RevealedAccountDeltaCommitment revealedCommitments = 3;
+    PublicKeyCredentialRequestOptions credentialRequest = 4;
+}
+
+message ProcessWithdrawalRequest {
+    bytes id = 1;
+    AuthenticatorAssertionResponse assertion = 2;
+}
+
+message ProcessWithdrawalResponse {
+}

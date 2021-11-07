@@ -1,0 +1,33 @@
+[
+    {
+        "name": "Audit",
+        "inputs": [
+            {
+                "type": "bytes",
+                "name": "ipfs_address",
+                "indexed": false
+            }
+        ],
+        "anonymous": false,
+        "type": "event"
+    },
+    {
+        "outputs": [],
+        "inputs": [],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+    },
+    {
+        "name": "log_audit",
+        "outputs": [],
+        "inputs": [
+            {
+                "type": "bytes",
+                "name": "ipfs_address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "gas": 7575
+    }
+]

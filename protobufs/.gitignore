@@ -1,0 +1,8 @@
+python/protobufs/**/*_pb2.py
+python/protobufs/**/*_pb2.pyi
+python/protobufs/**/*_pb2_grpc.py
+python/protobufs/**/*_pb2_grpc.pyi
+js/**/*_pb_service.js
+js/**/*_pb.js
+js/**/*_pb_service.d.ts
+js/**/*_pb.d.ts

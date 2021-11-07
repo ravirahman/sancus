@@ -1,0 +1,42 @@
+on:
+  push:
+    paths:
+      - 'client/**'
+      - 'protobufs/**'
+      - '.github/**'
+  workflow_dispatch: {}
+defaults:
+  run:
+    shell: bash
+    working-directory: client
+jobs:
+  client:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/js/protobufs
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 15.x
+      - name: Cache npm
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.OS }}-node-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.OS }}-node-
+            ${{ runner.OS }}-
+      - name: Dependencies
+        run: |
+          set -ex
+          yarn
+      - name: Lint
+        run: |
+          set -ex
+          yarn lint
+          git diff --stat --exit-code
+      - name: Build
+        run: |
+          set -ex
+          yarn build

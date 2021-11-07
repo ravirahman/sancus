@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package sancus;
+
+// message types for Bitcoin
+
+message BitcoinTransactionDestination {
+    string value = 1;
+    string toAddress = 2;
+}
+message BitcoinTransactionSource {
+    bytes txid = 1;
+    uint64 vout = 2;
+}
+
+message BitcoinTxParams {
+    repeated BitcoinTransactionSource sources = 1;
+    repeated BitcoinTransactionDestination destinations = 2;
+}
+
+message BitcoinTransaction {
+    bytes serializedTransaction = 1; // serialization of https://github.com/petertodd/python-bitcoinlib/blob/0ea83c4fd499c63823754627c69ebdd79dc0d62c/bitcoin/core/__init__.py#L388
+}

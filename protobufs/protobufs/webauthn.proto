@@ -1,0 +1,132 @@
+syntax = "proto3";
+
+import "google/protobuf/any.proto";
+
+package sancus;
+
+message ChallengeRequest {
+    enum ChallengeType {
+        INVALID_CHALLENGE_TYPE = 0;
+        REGISTRATION = 1;
+        LOGIN = 2;
+        WITHDRAWAL = 3;
+        EXCHANGE = 4;
+        LOAN_ISSUANCE = 5;
+        ADD_KEY = 6;
+        REVOKE_KEY = 7;
+    };
+    ChallengeType challengeType = 1;
+    bytes nonce = 2;  // also serves as the challenge id
+    google.protobuf.Any request = 3;
+    bytes userId = 4;
+}
+
+
+enum Attestation {
+    NONE = 0;
+    INDIRECT = 1;
+    DIRECT = 2;
+}
+
+enum UserVerification {
+    REQUIRED = 0;
+    PREFERRED = 1;
+    DISCOURAGED = 2;
+}
+
+enum AuthenticatorAttachment {
+    INVALID_AUTHENTICATOR_ATTACHMENT = 0;
+    PLATFORM = 1;
+    CROSS_PLATFORM = 2;
+}
+
+enum AuthenticatorTransport {
+    INVALID_TRANSPORT = 0;
+    USB = 1;
+    NFC = 2;
+    BLE = 3;
+    INTERNAL = 4;
+};
+
+enum Algorithm {
+    INVALID_ALGORITHM = 0;
+    ES256 = 1;
+    ES384 = 2;
+    ES512 = 3;
+    EDDSA = 4;
+    RS256 = 5;
+}
+
+message PublicKeyCredentialRpEntity {
+    string id = 1;
+    string name = 2;
+}
+
+message PublicKeyCredentialUserEntity {
+    bytes id = 1;
+    string name = 2;
+    string displayName = 3;
+}
+
+message AuthenticatorSelectionCriteria {
+    AuthenticatorAttachment authenticatorAttachment = 1;
+    bool requireResidentKey = 2;
+    UserVerification userVerification = 3;
+}
+
+enum PublicKeyCredentialType {
+    INVALID = 0;
+    PUBLIC_KEY = 1;
+}
+
+message PublicKeyCredentialParameters {
+    Algorithm alg = 1;
+    PublicKeyCredentialType type = 2;
+}
+
+message PublicKeyCredentialDescriptor {
+    bytes id = 1;
+    PublicKeyCredentialType type = 2;
+    repeated AuthenticatorTransport transports = 3;
+}
+
+message TokenBinding {
+    enum Status {
+        INVALID_STATUS = 0;
+        SUPPORTED = 1;
+        PRESENT = 2;
+    }
+    Status status = 1;
+    bytes id = 2;
+}
+
+message PublicKeyCredentialRequestOptions {
+    bytes challenge = 1;  // MUST BE a sha256 of a ChallengeRequest bytes
+    uint64 timeout = 2;
+    string rpId = 3;
+    repeated PublicKeyCredentialDescriptor allowCredentials = 4;
+    UserVerification userVerification = 5;
+}
+
+message AuthenticatorAssertionResponse {
+    bytes clientData = 1;
+    bytes authenticatorData = 2;
+    bytes credentialId = 3;
+    bytes signature = 4;
+} 
+
+message PublicKeyCredentialCreationOptions {
+    bytes challenge = 2;
+    PublicKeyCredentialRpEntity rp = 3;
+    PublicKeyCredentialUserEntity user = 4;
+    repeated PublicKeyCredentialParameters pubKeyCredParams = 5;
+    uint64 timeout = 6;
+    repeated PublicKeyCredentialDescriptor excludedCredentials = 7;
+    Attestation attestation = 8;
+    AuthenticatorSelectionCriteria authenticatorSelection = 9;
+}
+
+message AuthenticatorAttestationResponse {
+    bytes clientData = 1;
+    bytes attestationObject = 2;
+} 

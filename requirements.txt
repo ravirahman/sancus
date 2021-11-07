@@ -1,0 +1,9 @@
+isort
+pylint
+mypy
+web3
+black
+numpy
+./common
+./auditor
+./backend

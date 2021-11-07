@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+package sancus.institution;
+
+import "protobufs/audit.proto";
+
+service AuditGenUserCumulativeLiability {
+    rpc ListUserCumulativeLiabilitiesByAudit(ListUserCumulativeLiabilitiesByAuditRequest) returns (ListUserCumulativeLiabilitiesByAuditResponse);
+    rpc ListUserCumulativeLiabilitiesNotInAudit(ListUserCumulativeLiabilitiesNotInAuditRequest) returns (ListUserCumulativeLiabilitiesNotInAuditResponse);
+    rpc AddUserCumulativeLiabilityToAudit(AddUserCumulativeLiabilityToAuditRequest) returns (AddUserCumulativeLiabilityToAuditResponse);
+    rpc GetUserCumulativeLiability(GetUserCumulativeLiabilityRequest) returns (GetUserCumulativeLiabilityResponse);
+}
+
+message ListUserCumulativeLiabilitiesByAuditRequest {
+    message Request {
+        uint64 auditVersion = 1;
+    }
+    oneof testRequestOrNext {
+        Request request = 1;
+        string nextToken = 2;
+     }
+}
+
+message ListUserCumulativeLiabilitiesByAuditResponse {
+    message Response {
+        UserCumulativeLiability userCumulativeLiability = 1;
+    }
+    repeated Response response = 1;
+    string nextToken = 2;
+}
+
+message ListUserCumulativeLiabilitiesNotInAuditRequest {
+    message Request {
+        uint64 auditVersion = 1;
+    }
+    oneof testRequestOrNext {
+         Request request = 1;
+         string nextToken = 2;
+     }
+}
+
+message ListUserCumulativeLiabilitiesNotInAuditResponse {
+    message Response {
+        bytes userId = 1;
+    }
+    repeated Response response = 1;
+    string nextToken = 2;
+}
+
+message AddUserCumulativeLiabilityToAuditRequest {
+    bytes userId = 1;
+    uint64 auditVersion = 2;
+}
+
+message AddUserCumulativeLiabilityToAuditResponse {
+    UserCumulativeLiability userCumulativeLiability = 1;
+}
+
+
+message GetUserCumulativeLiabilityRequest {
+    bytes userId = 1;
+    uint64 auditVersion = 2;
+}
+
+message GetUserCumulativeLiabilityResponse {
+    UserCumulativeLiability userCumulativeLiability = 1;
+}

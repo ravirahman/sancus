@@ -1,0 +1,24 @@
+name: Python build
+inputs:
+  test_timeout:
+    description: Test timeout, in minutes
+    default: 3
+  working_directory:
+    required: true
+    description: Directory containing the Makefile
+runs:
+  using: composite
+  steps:
+    - name: Isort Format
+      shell: bash
+      working-directory: ${{ inputs.working_directory }}
+      run: |
+        set -ex
+        make isort format
+        git diff --stat --exit-code
+    - name: Pylint Typecheck
+      shell: bash
+      working-directory: ${{ inputs.working_directory }}
+      run: |
+        set -ex
+        make pylint typecheck -j2 

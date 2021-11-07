@@ -1,0 +1,14 @@
+name: Setup certificates
+inputs:
+  working_directory:
+    required: true
+    description: Directory containing the Makefile
+runs:
+  using: composite
+  steps:
+    - name: Certificates
+      shell: bash
+      working-directory: ${{ inputs.working_directory }}
+      run: |
+        set -ex
+        make certificates

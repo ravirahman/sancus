@@ -1,0 +1,128 @@
+version: "3.7"
+services:
+  geth:
+    # pinning to this version because of compatibility issues
+    image: ethereum/client-go:release-1.9
+    ports:
+      - "8545:8545"
+      - "8546:8546"
+    entrypoint: [ "/bin/setup.sh" ]
+    volumes:
+      - type: bind
+        source: ./geth/setup.sh
+        target: /bin/setup.sh
+        read_only: true
+      - type: volume
+        source: ethereum_data
+        target: /data
+      - type: bind
+        source: ./output
+        target: /output
+    restart: on-failure
+  eth-contracts:
+    build:
+      context: eth-contracts
+    command: [ "/wait-for-it.sh", "geth:8545", "--", "python3", "/bin/deploy.py" ]
+    volumes:
+      - type: bind
+        source: ./eth-contracts/deploy.py
+        target: /bin/deploy.py
+        read_only: true
+      - type: bind
+        source: ./eth-contracts/erc20contract.vy
+        target: /erc20contract.vy
+        read_only: true
+      - type: bind
+        source: ./eth-contracts/audit_contract.vy
+        target: /audit_contract.vy
+        read_only: true
+      - type: bind
+        source: ./output
+        target: /output
+  bitcoin-core:
+    build:
+      context: bitcoin-core
+    environment:
+      BITCOIN_DATA: /data
+    volumes:
+      - type: volume
+        source: bitcoin_data
+        target: /data
+      - type: bind
+        source: ./output
+        target: /output
+    restart: on-failure
+    ports:
+      - "18443:18443"
+      - "18444:18444"
+  bitcoin-miner:
+    image: ruimarinho/bitcoin-core:latest
+    entrypoint: [ "/bin/miner.sh" ]
+    volumes:
+      - type: volume
+        source: bitcoin_data
+        target: /data
+      - type: bind
+        source: ./bitcoin-miner/miner.sh
+        target: /bin/miner.sh
+        read_only: true
+    restart: on-failure
+  ipfs:
+    image: "ipfs/go-ipfs:release"
+    entrypoint: [ "/sbin/tini", "--", "/entrypoint.sh" ]
+    command: ["daemon", "--migrate=true"]
+    volumes: 
+      - type: "volume"
+        source: "ipfs_staging"
+        target: "/export"
+      - type: "volume"
+        source: "ipfs_data"
+        target: "/data/ipfs"
+      - type: bind
+        source: ./ipfs/entrypoint.sh
+        target: /entrypoint.sh
+        read_only: true
+    restart: on-failure
+    ports:
+      - "4001:4001"
+      - "4001:4001/udp"
+      - "5001:5001"
+      - "8080:8080"
+      - "8081:8081"
+  # random-bitcoin:
+  #   build:
+  #     context: ./transaction_bots
+  #   volumes: 
+  #     - type: "bind"
+  #       source: "./transaction_bots/random_bitcoin.py"
+  #       target: "/random_bitcoin.py"
+  #       read_only: true
+  #   command: ["python", "/random_bitcoin.py"]
+  # random-ethereum:
+  #   build:
+  #     context: ./transaction_bots
+  #   volumes: 
+  #     - type: "bind"
+  #       source: "./transaction_bots/random_ethereum.py"
+  #       target: "/random_ethereum.py"
+  #       read_only: true
+  #   command: ["python", "/random_ethereum.py"]
+  mysql:
+    image: "mysql:latest"
+    command: --default-authentication-plugin=mysql_native_password
+    environment: 
+      MYSQL_ROOT_PASSWORD: password
+    restart: on-failure
+    ports:
+      - "3306:3306"
+    volumes:
+      - type: "volume"
+        source: "mysql_data"
+        target: "/var/lib/mysql"
+
+volumes:
+  ipfs_staging:
+  ipfs_data:
+  ethereum_data:
+  bitcoin_data:
+  mysql_data:

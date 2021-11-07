@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package sancus.institution;
+
+import "google/protobuf/timestamp.proto";
+
+import "protobufs/account.proto";
+
+service Deposit {
+    rpc MakeDepositKey(MakeDepositKeyRequest) returns (MakeDepositKeyResponse);
+    rpc ListDepositKeys(ListDepositKeysRequest) returns (ListDepositKeysResponse);
+    rpc DepositFromFaucet(DepositFromFaucetRequest) returns (DepositFromFaucetResponse);
+}
+
+message MakeDepositKeyRequest {
+    bytes accountId = 1;
+}
+
+message RevealedDepositKey {
+    bytes keyId = 1;
+    string address = 2;
+    RevealedPedersenCommitment ownershipCommitment = 5;
+}
+
+message MakeDepositKeyResponse {
+    RevealedDepositKey depositKey = 1;
+}
+
+message ListDepositKeysRequest {
+    message Request {
+        bytes accountId = 1;
+        google.protobuf.Timestamp fromTimestamp = 2;
+        google.protobuf.Timestamp toTimestamp = 3;
+    }
+    oneof testRequestOrNext {
+        Request request = 1;
+        string nextToken = 2;
+    }
+}
+
+message ListDepositKeysResponse {
+    repeated RevealedDepositKey response = 1;
+    string nextToken = 2;
+}
+
+message DepositFromFaucetRequest {
+    string currency = 1;
+    string address = 2;
+}
+
+message DepositFromFaucetResponse {
+}

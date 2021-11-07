@@ -1,0 +1,9 @@
+*.db
+*.crt
+*.pem
+*.key
+*.db-journal
+env/*
+__pycache__/
+results/
+.env

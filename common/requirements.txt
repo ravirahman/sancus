@@ -1,0 +1,17 @@
+SQLAlchemy==1.4.0b3
+sqlalchemy-utils
+protobuf
+git+https://github.com/ravirahman/zksk@0ae25d26a1d9bc48ee0eb2d7d1e544b901775d0c#egg=zksk
+git+https://github.com/ravirahman/petlib@3b28c97955655671fbc167e007ab6f7ea438801b#egg=petlib
+hexbytes
+sqlalchemy-stubs
+pylint
+black
+pytz
+coverage
+ipfshttpclient
+py-cid
+isort
+grpc-interceptor
+grpc-stubs
+../protobufs/python

@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package sancus.institution;
+
+import "protobufs/audit.proto";
+
+service AuditGenAccountDeltaGroup {
+    rpc ListAccountDeltaGroupsNotInAudit(ListAccountDeltaGroupsNotInAuditRequest) returns (ListAccountDeltaGroupsNotInAuditResponse);
+    rpc ListAccountDeltaGroupsByAudit(ListAccountDeltaGroupsByAuditRequest) returns (ListAccountDeltaGroupsByAuditResponse);
+    rpc AddAccountDeltaGroupToAudit(AddAccountDeltaGroupToAuditRequest) returns (AddAccountDeltaGroupToAuditResponse);
+    rpc GetAccountDeltaGroup(GetAccountDeltaGroupRequest) returns (GetAccountDeltaGroupResponse);
+}
+
+message ListAccountDeltaGroupsNotInAuditRequest {
+    message Request {
+    }
+    oneof testRequestOrNext {
+         Request request = 1;
+         string nextToken = 2;
+     }
+}
+
+message ListAccountDeltaGroupsNotInAuditResponse {
+    message Response {
+        bytes accountDeltaGroupId = 1;
+    }
+    repeated Response response = 1;
+    string nextToken = 2;
+}
+
+message ListAccountDeltaGroupsByAuditRequest {
+    message Request {
+          uint64 auditVersion = 1;
+    }
+    oneof testRequestOrNext {
+         Request request = 1;
+         string nextToken = 2;
+     }
+}
+
+message ListAccountDeltaGroupsByAuditResponse {
+    message Response {
+        AccountDeltaGroup accountDeltaGroup = 1;
+    }
+    repeated Response response = 1;
+    string nextToken = 2;
+}
+
+message AddAccountDeltaGroupToAuditRequest {
+    bytes accountDeltaGroupId = 1;
+    uint64 auditVersion = 2;
+}
+
+message AddAccountDeltaGroupToAuditResponse {
+    AccountDeltaGroup accountDeltaGroup = 1;
+}
+
+
+message GetAccountDeltaGroupRequest {
+    bytes accountDeltaGroupId = 1;
+}
+
+message GetAccountDeltaGroupResponse {
+    AccountDeltaGroup accountDeltaGroup = 1;
+}

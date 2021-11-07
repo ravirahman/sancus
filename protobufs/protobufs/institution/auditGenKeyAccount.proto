@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package sancus.institution;
+
+import "protobufs/audit.proto";
+
+service AuditGenKeyAccount {
+    rpc ListKeyAccountsByAudit(ListKeyAccountsByAuditRequest) returns (ListKeyAccountsByAuditResponse);
+    rpc ListKeyAccountsNotInAudit(ListKeyAccountsNotInAuditRequest) returns (ListKeyAccountsNotInAuditResponse);
+    rpc AddKeyAccountToAudit(AddKeyAccountToAuditRequest) returns (AddKeyAccountToAuditResponse);
+    rpc GetKeyAccount(GetKeyAccountRequest) returns (GetKeyAccountResponse);
+}
+
+message ListKeyAccountsByAuditRequest {
+    message Request {
+          uint64 auditVersion = 1;
+    }
+    oneof testRequestOrNext {
+         Request request = 1;
+         string nextToken = 2;
+     }
+}
+
+message ListKeyAccountsByAuditResponse {
+    message Response {
+        KeyAccount key = 1;
+    }
+    repeated Response response = 1;
+    string nextToken = 2;
+}
+
+message ListKeyAccountsNotInAuditRequest {
+    message Request {
+    }
+    oneof testRequestOrNext {
+         Request request = 1;
+         string nextToken = 2;
+     }
+}
+
+message ListKeyAccountsNotInAuditResponse {
+    message Response {
+        bytes keyId = 1;
+        bytes accountId = 2;
+    }
+    repeated Response response = 1;
+    string nextToken = 2;
+}
+
+
+message AddKeyAccountToAuditRequest {
+    bytes keyId = 1;
+    bytes accountId = 2;
+    uint64 auditVersion = 3;
+}
+
+message AddKeyAccountToAuditResponse {
+    KeyAccount keyAccount = 1;
+}
+
+message GetKeyAccountRequest {
+    bytes keyId = 1;
+    bytes accountId = 2;
+}
+
+message GetKeyAccountResponse {
+    KeyAccount keyAccount = 1;
+}

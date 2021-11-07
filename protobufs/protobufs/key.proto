@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package sancus;
+
+enum KeyType {
+    INVALID_KEY_TYPE = 0;
+    COLD = 1;
+    HOT = 2;
+    ANONYMOUS = 3;
+}

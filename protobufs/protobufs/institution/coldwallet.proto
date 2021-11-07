@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package sancus.institution;
+
+import "protobufs/eth.proto";
+import "protobufs/bitcoin.proto";
+
+service ColdWallet {
+    rpc CreateKeyPairs(CreateKeyPairsRequest) returns (CreateKeyPairsResponse);
+    rpc SignEthereumTransactions(SignEthereumTransactionsRequest) returns (SignEthereumTransactionsResponse);
+    rpc SignBitcoinTransactions(SignBitcoinTransactionsRequest) returns (SignBitcoinTransactionsResponse);
+}
+
+message CreateKeyPairsRequest {
+    uint64 numKeys = 1;
+}
+
+message CreateKeyPairsResponse {
+    message Key {
+        bytes keyId = 1;
+        bytes publicKey = 2;
+        bytes permutedPrivateKey = 3;
+        bytes permutationNIZK = 4;
+    }
+    
+    repeated Key publicKeys = 1; 
+}
+
+message SignEthereumTransactionsRequest {
+    repeated EthereumTxParams transactions = 1;
+}
+
+message SignEthereumTransactionsResponse {
+    repeated bytes transactions = 1;
+}
+
+message SignBitcoinTransactionsRequest {
+    message TransactionRequest {
+        repeated bytes vinKeyIds = 1;
+        BitcoinTxParams txParams = 2;
+    }
+    repeated TransactionRequest transactions = 1;
+}
+
+message SignBitcoinTransactionsResponse {
+    repeated bytes transactions = 1;
+}

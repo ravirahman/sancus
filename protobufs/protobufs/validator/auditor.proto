@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package sancus.validator;
+
+import "protobufs/audit.proto";
+import "protobufs/account.proto";
+
+service Auditor {
+    rpc GetLatestAuditVersion(GetLatestAuditVersionRequest) returns (GetLatestAuditVersionResponse);
+    rpc GetAudit(GetAuditRequest) returns (GetAuditResponse);
+    rpc ValidateUnsignedBlockchainTransaction(ValidateUnsignedBlockchainTransactionRequest) returns (ValidateUnsignedBlockchainTransactionResponse);
+    rpc ListKeyAccounts(ListKeyAccountsRequest) returns (ListKeyAccountsResponse);
+}
+
+message GetLatestAuditVersionRequest {
+}
+
+message GetLatestAuditVersionResponse {
+    uint64 version = 1;
+}
+
+message GetAuditRequest {
+    uint64 version = 1;
+}
+
+message GetAuditResponse {
+    Audit audit = 1;
+}
+
+message ValidateUnsignedBlockchainTransactionRequest {
+    UnsignedBlockchainTransacton transaction = 1;
+}
+
+message ValidateUnsignedBlockchainTransactionResponse {
+    uint64 blockNumber = 1; // block number at which validation was performed
+    bytes blockHash = 2;  // block hash corresponding to the above block number
+
+    // whether this unsigned blockchain transaction, should it be possible to mine a block given these transaction parameters in the request, is gauranteed to be a new transaction.
+    // if True, then you know that this transaction has yet to occur on the chain. While it may be possible that this transaction will never be mined, the customer knows
+    // that if it is ever mined, it would represent a new transfer of funds (and not a repeat of an existing transfer of funds)
+    // if False, then you know that the transaction has already been mined (or cannot be mined given the current state of the blockchain). This could mean that this
+    // UnsignedBlockchainTransaction represents a previous transaction already mined on the blockchain, or has invalid tx inputs. There is no gaurantee that this 
+    // tx would represent a new transfer of funds
+
+    // note that this is suspetable to a race condition, where if a customer has multiple withdrawals of the same amount going to the same address, then the institution
+    // could reuse the same UnsignedBlockchainTransaction for both withdrawals, and this `wouldBeNew` field could be True for both. It is the client's reponsibility to validate
+    // that the set of real (non-decoy) UnsignedBlockchainTransactions is disjoint among (pending) withdrawal requests
+    bool wouldBeNew = 3;
+}
+
+message ListKeyAccountsRequest {
+    message Request {
+        bytes accountId = 1;
+        repeated bytes keyIds = 2; // optionally filter to these key ids
+    }
+    oneof testRequestOrNext {
+        Request request = 1;
+        string nextToken = 2;
+    }
+}
+
+
+message ListKeyAccountsResponse {
+    message Response {
+        KeyAccount key = 1;
+        string depositAddress = 2;  // the deposit address corresponding to this keyAccount
+    }
+    repeated Response response = 1;
+    string nextToken = 2;
+}

@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package sancus.institution;
+
+import "protobufs/audit.proto";
+
+service AuditGenKeyAccountLiability {
+    rpc ListKeyAccountLiabilitiesByAudit(ListKeyAccountLiabilitiesByAuditRequest) returns (ListKeyAccountLiabilitiesByAuditResponse);
+    rpc ListKeyAccountLiabilitiesNotInAudit(ListKeyAccountLiabilitiesNotInAuditRequest) returns (ListKeyAccountLiabilitiesNotInAuditResponse);
+    rpc AddKeyAccountLiabilityToAudit(AddKeyAccountLiabilityToAuditRequest) returns (AddKeyAccountLiabilityToAuditResponse);
+    rpc GetKeyAccountLiability(GetKeyAccountLiabilityRequest) returns (GetKeyAccountLiabilityResponse);
+}
+
+message ListKeyAccountLiabilitiesByAuditRequest {
+    message Request {
+        uint64 auditVersion = 1;
+    }
+    oneof testRequestOrNext {
+         Request request = 1;
+         string nextToken = 2;
+     }
+}
+
+message ListKeyAccountLiabilitiesByAuditResponse {
+    message Response {
+        KeyAccountLiability keyAccountLiability = 1;
+    }
+    repeated Response response = 1;
+    string nextToken = 2;
+}
+
+
+message ListKeyAccountLiabilitiesNotInAuditRequest {
+    message Request {
+        uint64 auditVersion = 1;
+    }
+    oneof testRequestOrNext {
+         Request request = 1;
+         string nextToken = 2;
+     }
+}
+
+message ListKeyAccountLiabilitiesNotInAuditResponse {
+    message Response {
+        bytes keyId = 1;
+        bytes accountId = 2;
+    }
+    repeated Response response = 1;
+    string nextToken = 2;
+}
+
+message AddKeyAccountLiabilityToAuditRequest {
+    bytes keyId = 1;
+    bytes accountId = 2;
+    uint64 auditVersion = 3;
+}
+
+message AddKeyAccountLiabilityToAuditResponse {
+    KeyAccountLiability keyAccountLiability = 1;
+}
+
+message GetKeyAccountLiabilityRequest {
+    bytes keyId = 1;
+    bytes accountId = 2;
+    uint64 auditVersion = 3;
+}
+
+message GetKeyAccountLiabilityResponse {
+    KeyAccountLiability keyAccountLiability = 1;
+}

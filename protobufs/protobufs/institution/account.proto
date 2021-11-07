@@ -1,0 +1,112 @@
+syntax = "proto3";
+
+package sancus.institution;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/any.proto";
+
+import "protobufs/account.proto";
+import "protobufs/webauthn.proto";
+
+service Account {
+    rpc ListAccounts(ListAccountsRequest) returns (ListAccountsResponse);
+    rpc ListTransactions(ListTransactionsRequest) returns (ListTransactionsResponse);
+    rpc MakeAccount(MakeAccountRequest) returns (MakeAccountResponse);
+}
+
+enum TransactionType {
+    INVALID_TRANSACTION_TYPE = 0;
+    DEPOSIT = 1;
+    EXCHANGE = 2;
+    WITHDRAWAL = 3;
+}
+
+enum KeyType {
+    INVALID_KEY_TYPE = 0;
+    COLD = 1;
+    HOT = 2;
+    ANONYMOUS = 3;
+}
+
+enum TransactionStatus {
+    INVALID_STATUS = 0;
+    PENDING = 1;
+    COMPLETED = 2;
+    CANCELED = 3;
+}
+
+message ListAccountsRequest {
+    message Request {
+        repeated bytes ids = 1;
+        repeated string currencies = 2;
+        repeated AccountType accountTypes = 3;
+    }
+    oneof testRequestOrNext {
+        Request request = 1;
+        string nextToken = 2;
+    }
+}
+
+message ListAccountsResponse {
+    repeated AccountResponse response = 1;
+    string nextToken = 2; // JWT of a NextToken
+}
+
+message AccountResponse {
+    bytes id = 1;
+    AccountType accountType = 2;
+    string currency = 3;
+    string availableAmount = 4;
+    string pendingAmount = 5;
+}
+
+message ListTransactionsRequest {
+    message Request {
+        bytes accountId = 1;
+        google.protobuf.Timestamp fromTimestamp = 2;  // required
+        google.protobuf.Timestamp toTimestamp = 3;  // required
+        repeated TransactionType transactionTypes = 4;  // if empty, then all transaction types
+    }
+    oneof testRequestOrNext {
+        Request request = 1;
+        string nextToken = 2;
+    }
+}
+
+message ExchangeTransaction {
+    bytes accountDeltasRequestId = 1;
+    bytes otherAccountId = 2;
+    bytes otherTransactionId = 3;
+    ChallengeRequest challengeRequest = 4;  // challenge is of type AccountDeltaGroupChallengeRequest
+    AuthenticatorAssertionResponse assertion = 5;
+}
+
+message WithdrawalTransaction {
+    bytes accountDeltasRequestId = 1;
+    ChallengeRequest challengeRequest = 2;  // challenge is of type AccountDeltaGroupChallengeRequest
+    AuthenticatorAssertionResponse assertion = 3;
+}
+
+message TransactionResponse {
+    bytes id = 1;
+    bytes accountId = 2;
+    TransactionStatus status = 3;
+    google.protobuf.Timestamp timestamp = 4;
+    TransactionType transactionType = 5;
+    string amount = 6;
+    google.protobuf.Any extra = 7;  // either a exchange, or withdrawal transaction. For deposits this field is empty
+}
+
+message ListTransactionsResponse {
+    repeated TransactionResponse response = 1;
+    string nextToken = 2; // JWT of a NextToken
+}
+
+message MakeAccountRequest {
+    AccountType accountType = 1;
+    string currency = 2;
+}
+
+message MakeAccountResponse {
+    bytes accountId = 1;
+}

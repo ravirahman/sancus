@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package sancus.institution;
+
+import "google/protobuf/timestamp.proto";
+
+service Marketdata {
+    rpc ListCurrencies(ListCurrencyRequest) returns (ListCurrencyResponse);
+    rpc GetMarketQuote(GetMarketQuoteRequest) returns (GetMarketQuoteResponse);
+    rpc GetMarketExchangeRate(GetMarketExchangeRateRequest) returns (GetMarketExchangeRateResponse);
+    rpc GetLatestProcessedBlockNumber(GetLatestProcessedBlockNumberRequest) returns (GetLatestProcessedBlockNumberResponse);
+}
+
+message ListCurrencyRequest {
+    message Request {}
+    oneof testRequestOrNext {
+        Request request = 1;
+        string nextToken = 2;
+    }
+}
+
+message CurrencyResponse {
+    string symbol = 1;
+    string name = 2;
+    uint64 decimals = 3;
+}
+
+message ListCurrencyResponse {
+    repeated CurrencyResponse response = 1;
+    string nextToken = 2;  // JWT of a NextToken
+}
+
+
+message GetMarketExchangeRateRequest {
+    string fromCurrency = 1;
+    string toCurrency = 2;
+}
+
+message GetMarketQuoteRequest {
+    string fromCurrency = 1;
+    string toCurrency = 2;
+}
+
+message GetMarketQuoteResponse {
+    string rate = 1;
+    google.protobuf.Timestamp timestamp = 2;
+}
+
+message ExchangeRate {
+    string rate = 1;
+    string fromCurrency = 2;
+    string toCurrency = 3;
+}
+
+message GetMarketExchangeRateResponse {
+    string exchangeRateJWT = 1;
+}
+
+message GetLatestProcessedBlockNumberRequest {
+    string blockchain = 1;
+}
+
+message GetLatestProcessedBlockNumberResponse {
+    uint64 blockNumber = 1;
+}
