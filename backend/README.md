@@ -23,21 +23,3 @@ The backend will now be running on tcp://localhost:50051 (for gRPC) and https://
 
 [grpcwebproxy]: https://github.com/improbable-eng/grpc-web/tree/master/go/grpcwebproxy
 [grpcwebproxy-download]: https://github.com/improbable-eng/grpc-web/releases
-
-## Running the backend on openstack
-1. SSH into openstack: `ssh -i sancus-openstack.key ubuntu@sancus.csail.mit.edu`
-1. Check backend status: `systemctl status sancus-backend.service` and check logs: `journalctl -u sancus-backend.service -f --since "1 minute ago"`
-1. If the script is still running, stop it: `sudo systemctl stop sancus-backend.service`
-1. Clear the backend database: `sudo mysql -p` and enter the password `password`
-1. `DROP DATABASE backend;` and `exit`
-1. Make desired changes to backend
-1. Edit `sancus.py` to have the values in `eth.env` and `eth_contracts.env` in `infra/outputs` of `sancus-chain.csail.mit.edu`
-1. Run the backend again: `sudo systemctl start sancus-backend.service`
-
-Check backend status: `journalctl -u sancus-backend.service -f --since "1 hour ago"`
-
-This hosts the backend at https://sancus.csail.mit.edu:18443 for gRPC calls. To see the nginx confirmation: check `/etc/nginx/sites-enabled/sancus.csail.mit.edu.conf`
-
-Note: Because this is hosted on a different server than infra, the dotenv imports will not work, and will have to be commented out and replaced by manually copying over the account ids from `/sancus/infra/outputs` on the infra server. Also, http://localhost:8545 has to be replaced with http://sancus:dolos@sancus-chain.csail.mit.edu and http://bitcoin:password@localhost:18444" with http://bitcoin:password@sancus-chain.csail.mit.edu:58444".
-
-

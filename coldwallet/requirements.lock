@@ -29,7 +29,7 @@ mypy-extensions==0.4.3
 packaging==20.9
 parsimonious==0.8.1
 pathspec==0.8.1
-git+https://github.com/ravirahman/petlib@3b28c97955655671fbc167e007ab6f7ea438801b#egg=petlib
+git+https://github.com/gdanezis/petlib@7aafddb46f5e643c0a1addb1067acc3dc74ce59d#egg=petlib
 pluggy==0.13.1
 protobuf==3.14.0
 py==1.10.0
@@ -50,4 +50,4 @@ toolz==0.11.1
 typed-ast==1.4.2
 typing-extensions==3.7.4.3
 wrapt==1.12.1
-git+https://github.com/ravirahman/zksk@0ae25d26a1d9bc48ee0eb2d7d1e544b901775d0c#egg=zksk
+git+https://github.com/spring-epfl/zksk@master#egg=zksk
